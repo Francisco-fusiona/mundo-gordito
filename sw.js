@@ -1,4 +1,4 @@
-const C='gordito-v5';
+const C='gordito-v6';
 const FILES=["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "assets/cancion.mp3", "assets/candy.jpg", "assets/candy.mp4", "assets/canelita.jpg", "assets/canelita.mp4", "assets/chen.jpg", "assets/chen2.jpg", "assets/fiesta.jpg", "assets/final.mp4", "assets/gordito.jpg", "assets/intro.mp4", "assets/mapaches.jpg", "assets/mapaches.mp4", "assets/melito.jpg", "assets/melito.mp4", "assets/noticia.jpg", "assets/noticia_mapaches.mp4", "assets/portada.jpg", "assets/portada.mp4", "assets/super.jpg", "assets/susto.jpg", "assets/trofeo.jpg", "assets/v_campeon.mp3", "assets/v_casi.mp3", "assets/v_eso1.mp3", "assets/v_eso2.mp3", "assets/v_nopasa.mp3", "assets/v_vamos.mp3"];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
