@@ -120,6 +120,15 @@ video{width:100%;max-width:420px;max-height:76vh;border-radius:16px;background:#
 #hud b{color:#ffd21f}
 #stage{position:relative}
 canvas#c{display:block;touch-action:none;border-radius:10px;box-shadow:0 0 0 2px #ffd21f33,0 10px 30px #0008}
+#guia{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(12,7,32,.92);padding:14px}
+#guia.on{display:flex}
+#guia .gbox{background:#fff8e6;color:#3a1d0a;border:4px solid #ffd21f;border-radius:20px;max-width:420px;width:100%;max-height:92vh;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 0 #b3830a}
+#guia h3{margin:0;font-family:'Luckiest Guy',system-ui;font-size:26px;color:#d61f1f;text-align:center;letter-spacing:1px}
+#guia .gsec{font-family:'Luckiest Guy',system-ui;font-size:18px;color:#5b2bd0;margin-top:4px}
+#guia .gr{display:flex;align-items:center;gap:12px;font-size:16px;line-height:1.3}
+#guia .gk{flex:none;min-width:78px;text-align:center;background:#2b1764;color:#fff;border:3px solid #ffd21f;border-radius:14px;padding:6px 6px;font-size:20px;font-weight:bold}
+#guia .gm{background:#ffe9a8;border-radius:12px;padding:8px 10px;font-size:15px;text-align:center}
+#guia .btn{align-self:center;margin-top:4px}
 #pauseOv{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(12,7,32,.86);border-radius:10px;gap:12px}
 #pad{display:grid;gap:8px;touch-action:none;width:100%;max-width:440px;justify-content:center;align-items:stretch}
 #pad .pb{font-size:32px;border-width:3px;border-radius:18px}
@@ -164,7 +173,7 @@ input.name{font-family:inherit;font-weight:900;font-size:18px;padding:12px 14px;
   <div class="tabs" id="tabs"></div>
   <div id="worlds" style="display:flex;flex-direction:column;gap:10px;width:100%;align-items:center"></div>
   <div class="tot" id="tot"></div>
-  <div class="row"><button class="btn sec" id="bNews">📺 Ver la noticia</button><button class="btn sec" id="bCtrl">🎮 Controles</button><button class="mini" id="mute1">🔊</button></div>
+  <div class="row"><button class="btn sec" id="bNews">📺 Ver la noticia</button><button class="btn sec" id="bCtrl">🎮 Controles</button><button class="btn sec" id="bGuia">❓ Cómo se juega</button><button class="mini" id="mute1">🔊</button></div>
 </section>
 
 <!-- DIALOGO -->
@@ -199,6 +208,7 @@ input.name{font-family:inherit;font-weight:900;font-size:18px;padding:12px 14px;
   </div>
 </section>
 
+<div id="guia"><div class="gbox"><h3>🎮 ¿Cómo se juega?</h3><div id="gBody"></div><button class="btn" id="gOk">¡ENTENDIDO! ▶</button></div></div>
 <!-- CUADERNO -->
 <section class="screen" id="cuaderno">
   <div id="cHud"><span>📓 Ronda <b id="cStage">1</b></span><span>⏱ <b id="cTime">0</b></span><span><button class="mini" id="mute3">🔊</button> <button class="mini dev" id="skip2" style="display:none">⏭</button> <button class="mini" id="cExit">✖</button></span></div>
@@ -453,7 +463,18 @@ function openStage(i,w){
   if(s.vid){$('dImg').style.display='none';dv.style.display='block';const wide=s.img==='mapaches';dv.style.width=wide?'min(90vw,380px)':'min(64vw,270px)';dv.style.aspectRatio=wide?'16/9':'4/5';dv.src=s.vid;dv.play().catch(()=>{})}else{dv.pause();dv.style.display='none';$('dImg').style.display=''}$('dWho').textContent=s.who;$('dTxt').textContent=s.txt;
   show('dialogo');
 }
-$('dGo').onclick=()=>{$('dVid').pause();initAudio();if(curWorld===0)startStage(curStage);else if(curWorld===1)startCuaderno(curStage);else startPlat(curStage)};
+
+function guiaHTML(w){const play=(prog.ctrl||'play')==='play';const r=(k,t)=>'<div class="gr"><div class="gk">'+k+'</div><div>'+t+'</div></div>';let h='';
+ if(w===0||w===undefined){h+='<div class="gsec">🐶 Laberinto (Canelita)</div>'+r('▲ ◀ ▼ ▶','Toca una flecha <b>una vez</b> y el Gordito camina solo hacia allá. No tienes que dejarla apretada.')+r('👆 deslizar','También puedes deslizar el dedo sobre el laberinto.')+r('❚❚',play?'El botón redondo pone <b>pausa</b>.':'El botón de arriba pone <b>pausa</b>.')+'<div class="gm">Cómete todos los puntitos y esquiva a los mapaches 🦝. Los premios 🦴 🍦 ❤️ te ayudan.</div>'}
+ if(w===1||w===undefined){h+='<div class="gsec">🐱 Cuaderno (Melito)</div>'+r('👆 tocar','Toca la respuesta correcta. Si fallas, Chenchito te explica y sigues.')}
+ if(w===2||w===undefined){h+='<div class="gsec">😺 Escaleras (Candy)</div>'+r('◀ ▶','<b>Déjalo apretado</b> para caminar.')+r('▲ ▼','Párate frente a una escalera y sube o baja.')+r('SALTA','Brinca los barriles que ruedan.')+'<div class="gm">Llega hasta arriba con Candy. La bandera 🚩 guarda tu avance.</div>'}
+ h+='<div class="note" style="color:#6b4b2a">¿Prefieres otros botones? En el mapa toca <b>🎮 Controles</b> para cambiar entre Play y Atari.</div>';return h}
+let guiaNext=null;
+function showGuia(w,next){$('gBody').innerHTML=guiaHTML(w);guiaNext=next||null;$('guia').classList.add('on')}
+$('gOk').onclick=()=>{$('guia').classList.remove('on');sfx.star();const f=guiaNext;guiaNext=null;if(f)f()};
+$('bGuia').onclick=()=>showGuia();
+function goStage(){if(curWorld===0)startStage(curStage);else if(curWorld===1)startCuaderno(curStage);else startPlat(curStage)}
+$('dGo').onclick=()=>{$('dVid').pause();initAudio();prog.g=prog.g||{};if(curWorld!==1&&!prog.g[curWorld]){prog.g[curWorld]=1;save();showGuia(curWorld,goStage)}else goStage()};
 
 /* =================== MOTOR DEL LABERINTO =================== */
 const cv=$('c'),ctx=cv.getContext('2d');
